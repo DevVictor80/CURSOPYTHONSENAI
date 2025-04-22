@@ -3,10 +3,13 @@
 import tkinter as tk #importa ferramentas basica na biblioteca
 from tkinter import ttk, messagebox #importa ferramentas especificas do tkinter
 
-def carregar_pets():
+def carregar_pets(pets_list=None):
     for item in tree.get_children():
         tree.delete(item)
-    for pet in pets:tree.insert('','end', values=(pet['Id'], pet['Tutor'], pet['Nomepet'], pet['Espécie'], pet['Raça'], pet['Idade']))
+    pets_to_load = pets_list if pets_list is not None else pets 
+
+    for pet in  pets_to_load: tree.insert('','end', values=(pet['Id'], pet['Tutor'], pet['Nomepet'], pet['Espécie'], pet['Raça'], pet['Idade']))
+
 
 def adicionar_pet():
     global next_pet_id
@@ -100,6 +103,24 @@ def remover_pet():
         limpar_campos()
         carregar_pets()
 
+
+def pesquisa_por_tutor():
+    termo_pesquisa = entry_tutor.get().lower()#lower pesquisa em letras minuscula 
+
+    if not termo_pesquisa:
+        carregar_pets()
+        return
+    
+    pets_encontrados = [pet for pet in pets if termo_pesquisa in pet['Tutor'].lower()]
+
+    if not pets_encontrados:
+        messagebox.showinfo('Pesquisa','Nenhum pet encontrado para este tutor')
+
+        carregar_pets()
+    else:
+        carregar_pets(pets_encontrados)
+
+
     #dados em memoria
 pets = []#cria a lista de pets
 next_pet_id = 1#contador
@@ -148,6 +169,9 @@ btn_remover.grid(row=0, column=2, padx=5)
 
 btn_limpar = ttk.Button(frame_botoes,text='Limpar',command=limpar_campos) #cria botao
 btn_limpar.grid(row=0, column=3, padx=5)
+
+btn_pesquisar = ttk.Button (frame_botoes,text='Pesquisar tutor', command=pesquisa_por_tutor)
+btn_pesquisar.grid(row=0,column=4, padx=5)
 
 #tabela de pets
 frame_tabela = ttk.Frame(root)
