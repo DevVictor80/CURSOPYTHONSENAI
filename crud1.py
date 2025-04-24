@@ -1,8 +1,28 @@
 #sistema cadastro pet
-
 import tkinter as tk #importa ferramentas basica na biblioteca
 from tkinter import ttk, messagebox, filedialog #importa ferramentas especificas do tkinter
 import json #import necessario para trabalhar com JSON
+def carregar_de_json():
+    global pets, next_pet_id
+
+    arquivo = filedialog.askopenfilename(filetypes=[('Arquivos JSON', '.json')], title='Selecionar arquivos JSON para carregar')
+
+    if not arquivo: # se o usuario cancelar 
+        return
+
+    try:#todo try precisa ter um except exception
+        with open (arquivo, 'r', encoding='utf-8') as f: 
+            pets_carregados = json.load(f)
+
+        #atualiza a lista de pets e o proximo id
+        pets = pets_carregados
+        if pets:
+            next_pet_id=max(pet['Id']for pet in pets)+1
+        else :
+              next_pet_id =1
+        carregar_pets()
+        messagebox.showinfo('Sucesso', f'Dados carregados com sucesso de:\n{arquivo}')
+    except Exception as e: messagebox.showerror('Erro', f'Ocorreu um erro ao carregar:\n{str(e)}')
 
 def salvar_para_json():
     if not pets:
@@ -16,8 +36,8 @@ def salvar_para_json():
     if not arquivo: #se o usuario cancelar 
         return
     try: # verifica se vai dar erro try (tentar)
-        with open (arquivo, 'w', encoding= 'utf-8)') as f: json.dump(pets, f, ensure_ascii=False, indent=4)
-        messagebox.showinfo ('Sucesso', f, 'Dados salvos com sucesso em: \n{arquivo}')
+        with open (arquivo, 'w', encoding= 'utf-8') as f: json.dump(pets, f, ensure_ascii=False, indent=4)
+        messagebox.showinfo ('Sucesso', f'Dados salvos com sucesso em: \n{arquivo}')
     except Exception as e:
         messagebox.showerror ('Erro', f'Ocorreu um erro ao salvar:\n{str(e)}')
                                             
@@ -195,7 +215,8 @@ btn_pesquisar.grid(row=0,column=4, padx=5)
 
 btn_salvar_json = ttk.Button (frame_botoes,text='Salvar Json', command=salvar_para_json)
 btn_salvar_json.grid(row=0, column=5, padx=5)
-
+btn_carregar_json = ttk.Button (frame_botoes,text='Carregar Json', command=carregar_de_json)
+btn_carregar_json.grid(row=0, column=6, padx=5)
 #tabela de pets
 frame_tabela = ttk.Frame(root)
 frame_tabela. pack(padx=10, pady=5, fill='both', expand=True)
